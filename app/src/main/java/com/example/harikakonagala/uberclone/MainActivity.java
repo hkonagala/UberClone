@@ -1,5 +1,6 @@
 package com.example.harikakonagala.uberclone;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import com.parse.ParseAnalytics;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else {
             if(ParseUser.getCurrentUser().get("riderOrDriver") !=null){
                 Log.i("info", "redirecting as " + ParseUser.getCurrentUser().get("riderOrDriver"));
+                redirect();
             }
         }
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
@@ -58,6 +61,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             userType = "driver";
         }
         ParseUser.getCurrentUser().put("riderOrDriver", userType);
+        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                redirect();
+            }
+        });
         Log.i("info", "redirecting as " + userType);
+
+    }
+
+    public void redirect(){
+        if(ParseUser.getCurrentUser().get("riderOrDriver").equals("rider")){
+            Intent intent = new Intent(MainActivity.this, RiderActivity.class);
+            startActivity(intent);
+        }else {
+            Intent i = new Intent(MainActivity.this, ViewRequestActivity.class);
+            startActivity(i);
+        }
     }
 }
